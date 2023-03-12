@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Bitcoin Network Graph</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.16.3/dist/cytoscape.min.js"></script>
+</head>
+<body>
+    <div id="cy"></div>
+    <script>
+        $(function(){
+            var cy = cytoscape({
+                container: $('#cy'),
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'label': 'data(id)',
+                            'background-color': '#666',
+                            'font-size': '10px'
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'line-color': '#ccc',
+                            'width': 1
+                        }
+                    }
+                ],
+                layout: {
+                    name: 'cose'
+                }
+            });
+
+            var walletAddress = "your-wallet-address-here";
+
+            // Make API request to Blockchain.com
+            $.getJSON("https://api.blockchain.com/v3/txs/?active=" + walletAddress, function(data){
+                $.each(data.txs, function(index, transaction){
+                    // Add nodes for each input and output address
+                    $.each(transaction.inputs, function(index, input){
+                        cy.add({
+                            data: {
+                                id: input.prev_out.addr
+                            }
+                        });
+                    });
+                    $.each(transaction.out, function(index, output){
+                        cy.add({
+                            data: {
+                                id: output.addr
+                            }
+                        });
+                    });
+
+                    // Add edges between input and output addresses
+                    $.each(transaction.inputs, function(index, input){
+                        $.each(transaction.out, function(index, output){
+                            cy.add({
+                                data: {
+                                    source: input.prev_out.addr,
+                                    target: output.addr
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
