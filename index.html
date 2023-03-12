@@ -41,12 +41,49 @@
                     'target-arrow-shape': 'triangle',
                     'text-wrap': 'wrap'
                 }
+            },
+            {
+                selector: ':selected',
+                style: {
+                    'border-color': '#000',
+                    'border-width': '3px'
+                }
+            },
+            {
+                selector: '.highlighted',
+                style: {
+                    'background-color': '#ff0'
+                }
             }
         ],
         layout: {
             name: 'dagre'
         },
         elements: []
+    });
+
+    // Add zooming and panning interactivity
+    cy.panzoom({
+        zoomDelay: 100,
+        zoomEnabled: true,
+        minZoom: 0.1,
+        maxZoom: 10,
+        fitPadding: 50
+    });
+
+    // Add tooltips for nodes and edges
+    cy.tooltip({
+        content: function (node) {
+            if (node.isNode()) {
+                return node.id();
+            } else {
+                return node.data('label');
+            }
+        },
+        delay: {
+            show: 100,
+            hide: 100
+        }
     });
 
     // Fetch Bitcoin transaction data from Blockchain.com API
@@ -69,37 +106,4 @@
                     elements.push({
                         data: {
                             id: txId,
-                            label: txId + '\n' + inputs.join(', ') + ' -> ' + outputs.join(', ')
-                        }
-                    });
-                    inputs.forEach(function (input) {
-                        if (input !== '1JCe8z4jJVNXSjohjM4i9Hh813dLCNx2Sy') {
-                            elements.push({
-                                data: {
-                                    id: input
-                                }
-                            });
-                            elements.push({
-                                data: {
-                                    id: input + '-' + txId,
-                                    source: input,
-                                    target: txId
-                                }
-                            });
-                        }
-                    });
-                    outputs.forEach(function (output) {
-                        if (output !== '1JCe8z4jJVNXSjohjM4i9Hh813dLCNx2Sy') {
-                            elements.push({
-                                data: {
-                                    id: output
-                                }
-                            });
-                            elements.push({
-                                data: {
-                                    id: txId + '-' + output,
-                                    source: txId,
-                                    target: output
-                                }
-                            });
-                       
+                            label: txId + '\n' + inputs.join(', ') + '
