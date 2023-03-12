@@ -40,4 +40,17 @@ fetch(url)
       .text(d => `${d.source.name} to ${d.target.name}`);
 
     // Position nodes and edges
-    const simulation = d
+    const simulation = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id(d => d.id).distance(50))
+      .force('charge', d3.forceManyBody().strength(-50))
+      .force('center', d3.forceCenter(svg.attr('width') / 2, svg.attr('height') / 2))
+      .on('tick', () => {
+        node.attr('cx', d => d.x)
+          .attr('cy', d => d.y);
+
+        edge.attr('x1', d => d.source.x)
+          .attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x)
+          .attr('y2', d => d.target.y);
+      });
+  });
