@@ -1,109 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Bitcoin Network Graph</title>
-    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-    <style>
-        #cy {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-        }
-    </style>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="app.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="cy"></div>
-<script>
-    var cy = cytoscape({
-        container: document.getElementById('cy'),
-        style: [
-            {
-                selector: 'node',
-                style: {
-                    'background-color': '#666',
-                    'label': 'data(id)',
-                    'font-size': '12px',
-                    'color': '#fff',
-                    'text-wrap': 'wrap'
-                }
-            },
-            {
-                selector: 'edge',
-                style: {
-                    'width': 2,
-                    'line-color': '#ccc',
-                    'curve-style': 'bezier',
-                    'target-arrow-color': '#ccc',
-                    'target-arrow-shape': 'triangle',
-                    'text-wrap': 'wrap'
-                }
-            },
-            {
-                selector: ':selected',
-                style: {
-                    'border-color': '#000',
-                    'border-width': '3px'
-                }
-            },
-            {
-                selector: '.highlighted',
-                style: {
-                    'background-color': '#ff0'
-                }
-            }
-        ],
-        layout: {
-            name: 'dagre'
-        },
-        elements: []
-    });
-
-    // Add zooming and panning interactivity
-    cy.panzoom({
-        zoomDelay: 100,
-        zoomEnabled: true,
-        minZoom: 0.1,
-        maxZoom: 10,
-        fitPadding: 50
-    });
-
-    // Add tooltips for nodes and edges
-    cy.tooltip({
-        content: function (node) {
-            if (node.isNode()) {
-                return node.id();
-            } else {
-                return node.data('label');
-            }
-        },
-        delay: {
-            show: 100,
-            hide: 100
-        }
-    });
-
-    // Fetch Bitcoin transaction data from Blockchain.com API
-    fetch('https://api.blockchain.com/v3/explorer/address/1JCe8z4jJVNXSjohjM4i9Hh813dLCNx2Sy?limit=50&offset=0&sort=0')
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (json) {
-            // Create nodes and edges for each transaction involving the specified wallet
-            var elements = [];
-            json.txs.forEach(function (tx) {
-                var txId = tx.hash;
-                var inputs = tx.inputs.map(function (input) {
-                    return input.prev_out.addr;
-                });
-                var outputs = tx.out.map(function (output) {
-                    return output.addr;
-                });
-                if (inputs.includes('1JCe8z4jJVNXSjohjM4i9Hh813dLCNx2Sy') || outputs.includes('1JCe8z4jJVNXSjohjM4i9Hh813dLCNx2Sy')) {
-                    elements.push({
-                        data: {
-                            id: txId,
-                            label: txId + '\n' + inputs.join(', ') + '
+    <h1>Bitcoin Network Graph</h1>
+    <div id="graph"></div>
+</body>
+</html>
